@@ -205,6 +205,6 @@ function followLinks($url) {
 
 }
 
-$startUrl = "http://www.yelp.com";
+$startUrl = "https://www.google.com/search?source=hp&ei=gNI7XK_cFMW-0PEPjf-K8A4&q=dogs&btnK=Google+Search&oq=dogs&gs_l=psy-ab.3..35i39j0j0i131j0j0i131j0j0i131j0l3.858.1148..1229...0.0..0.78.273.4......0....1..gws-wiz.....0.a4Kj6CRY7YY";
 followLinks($startUrl);
 ?>

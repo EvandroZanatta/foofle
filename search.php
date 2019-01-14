@@ -10,6 +10,8 @@ if(isset($_GET["term"])) {
 }
 
 $type = isset($_GET["type"]) ? $_GET["type"] : "sites";
+$page = isset($_GET["page"]) ? $_GET["page"] : 1;
+
 
 
 ?>
@@ -79,12 +81,62 @@ $type = isset($_GET["type"]) ? $_GET["type"] : "sites";
      <?php
         $resultsProvider = new SiteResultsProvider($con);
 
+        $pageLimit = 20;
+
+
        $numResults =  $resultsProvider -> getNumResults($term);
 
        echo "<p class='results-count'>$numResults results found</p>";
 
-       echo $resultsProvider -> getResultsHtml(1, 20, $term);
+       echo $resultsProvider -> getResultsHtml($page, $pageLimit, $term);
      ?>
+   </div>
+
+   <div class="pagination-container">
+
+    <div class="page-buttons">
+
+      <div class="page-number-container">
+        <img src="assets/img/page-start.png">
+      </div>
+
+      <?php
+
+        $currentPage = 1;
+        $pagesLeft = 10;
+
+        while($pagesLeft != 0) {
+
+          if($currentPage == $page) {
+            echo "<div class='page-number-container'>
+                    <img src='assets/img/page-selected.png'>
+                    <span class='page-number'>$currentPage</span>
+                  </div>";
+          } else {
+
+            echo "<div class='page-number-container'>
+                    <a href='search.php?term=$term&type=$type&page=$currentPage'>
+                      <img src='assets/img/page.png'>
+                      <span class='page-number'>$currentPage</span>
+                    </a>
+                  </div>";
+
+          }
+
+         
+
+          $currentPage++;
+          $pagesLeft--;
+        }
+
+      ?>
+
+      <div class="page-number-container">
+        <img src="assets/img/page-end.png">
+      </div>
+
+    </div>
+
    </div>
 
   </div>
