@@ -1,18 +1,17 @@
 <?php
 
-include("config.php");
-include("classes/SiteResultsProvider.php");
+include "config.php";
+include "classes/SiteResultsProvider.php";
+include "classes/ImageResultsProvider.php";
 
-if(isset($_GET["term"])) {
-  $term = $_GET["term"];
+if (isset($_GET["term"])) {
+    $term = $_GET["term"];
 } else {
-  exit("You must enter a search term");
+    exit("You must enter a search term");
 }
 
 $type = isset($_GET["type"]) ? $_GET["type"] : "sites";
 $page = isset($_GET["page"]) ? $_GET["page"] : 1;
-
-
 
 ?>
 
@@ -26,7 +25,12 @@ $page = isset($_GET["page"]) ? $_GET["page"] : 1;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Welcome to Foofle</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css" />
   <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -47,8 +51,8 @@ $page = isset($_GET["page"]) ? $_GET["page"] : 1;
         <form action="search.php" method="GET">
 
           <div class="search-bar-container">
-
-            <input name="term" type="text" class="search-box" value="<?php echo $term ?>"> 
+            <input type="hidden" name="type" value="<?php echo $type ?>">
+            <input name="term" type="text" class="search-box" value="<?php echo $term ?>">
             <button class="search-button">
               <img src="assets/img/icons/search.png" alt="search icon">
             </button>
@@ -78,18 +82,26 @@ $page = isset($_GET["page"]) ? $_GET["page"] : 1;
    </div>
 
    <div class="main-results-section">
-     <?php
-        $resultsProvider = new SiteResultsProvider($con);
+<?php
+if ($type == "sites") {
 
-        $pageLimit = 20;
+    $resultsProvider = new SiteResultsProvider($con);
 
+    $pageSize = 20;
+} else {
 
-       $numResults =  $resultsProvider -> getNumResults($term);
+    $resultsProvider = new ImageRestultsProvider($con);
 
-       echo "<p class='results-count'>$numResults results found</p>";
+    $pageSize = 30;
 
-       echo $resultsProvider -> getResultsHtml($page, $pageLimit, $term);
-     ?>
+}
+
+$numResults = $resultsProvider->getNumResults($term);
+
+echo "<p class='results-count'>$numResults results found</p>";
+
+echo $resultsProvider->getResultsHtml($page, $pageSize, $term);
+?>
    </div>
 
    <div class="pagination-container">
@@ -100,36 +112,44 @@ $page = isset($_GET["page"]) ? $_GET["page"] : 1;
         <img src="assets/img/page-start.png">
       </div>
 
-      <?php
+<?php
+$pagesToShow = 10;
+$numPages = ceil($numResults / $pageSize);
+$pagesLeft = min($pagesToShow, $numPages);
 
-        $currentPage = 1;
-        $pagesLeft = 10;
+$currentPage = $page - floor($pagesToShow / 2);
 
-        while($pagesLeft != 0) {
+if ($currentPage < 1) {
+    $currentPage = 1;
+}
 
-          if($currentPage == $page) {
-            echo "<div class='page-number-container'>
+if ($currentPage + $pagesLeft > $numPages + 1) {
+    $currentPage = $numPages + 1 - $pagesLeft;
+}
+
+while ($pagesLeft != 0 && $currentPage <= $numPages) {
+
+    if ($currentPage == $page) {
+        echo "<div class='page-number-container'>
                     <img src='assets/img/page-selected.png'>
                     <span class='page-number'>$currentPage</span>
                   </div>";
-          } else {
+    } else {
 
-            echo "<div class='page-number-container'>
+        echo "<div class='page-number-container'>
                     <a href='search.php?term=$term&type=$type&page=$currentPage'>
                       <img src='assets/img/page.png'>
                       <span class='page-number'>$currentPage</span>
                     </a>
                   </div>";
 
-          }
+    }
 
-         
+    $currentPage++;
+    $pagesLeft--;
+}
 
-          $currentPage++;
-          $pagesLeft--;
-        }
-
-      ?>
+?>
 
       <div class="page-number-container">
         <img src="assets/img/page-end.png">
@@ -141,5 +161,8 @@ $page = isset($_GET["page"]) ? $_GET["page"] : 1;
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
+  <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+  <script type="text/javascript" src="assets/js/script.js"></script>
 </body>
 </html>
