@@ -210,5 +210,5 @@ function followLinks($url)
 
 }
 
-$startUrl = "https://news.ycombinator.com/";
+$startUrl = "https://www.bbc.com/";
 followLinks($startUrl);
